@@ -20,7 +20,7 @@ Tailscale 安装后默认随系统开机起来，并一直挂在尾网上。这�
 
 ## 实现原理
 
-面板是 gpui-kit 写的 `View`（`mods/tailscale/main.js`）。它不直接改系统状态，点击时用 `osascript` 跑：
+面板是 gpui-kit 写的 `View`（`mods/tailscale/main.js`），以 dialog overlay 形式打开（`mod.json` 的 `overlay`，由 `keys.json` 绑定 `mod.open:tailscale` 唤起）。它不直接改系统状态，点击时用 `osascript` 跑：
 
 ```sh
 do shell script "<mod>/toggle.sh on|off" with administrator privileges
@@ -44,7 +44,7 @@ do shell script "<mod>/toggle.sh on|off" with administrator privileges
 
 `--accept-dns=false` 是因为这台机器的 DNS 交给 Clash，不能让 Tailscale 接管 DNS。`tailscale up` 要求把已经改过的非默认项再写一遍，漏掉会直接拒绝。换一台要 MagicDNS 的机器，先改 `toggle.sh` 里这个参数。
 
-`mod.json` 的 `place` 是 `none`。面板不会自己出现，要在布局里加一块，`content.mod` 填 `"tailscale"`。
+`mod.json` 的 `place` 是 `none`。面板不会自己出现：靠 `keys.json` 的 `mod.open:tailscale` 打开，`Esc` 关闭。
 
 ## 配置环境
 
@@ -55,8 +55,12 @@ do shell script "<mod>/toggle.sh on|off" with administrator privileges
 安装：
 
 1. 把 `mods/tailscale` 拷贝到 `~/.config/herdr-app/mods/tailscale`。同名目录已存在就先改名，不要覆盖。
-2. 在布局里加一块：`"content": { "mod": "tailscale" }`。
+2. 在 `~/.config/herdr-app/keys.json` 的 `global` 里加一条：`"cmd-shift-t": "mod.open:tailscale"`。
 3. 跑 `herdr-app check ~/.config/herdr-app/mods/tailscale`。
+
+按 `Cmd+Shift+T` 弹出开关，`Esc` 关掉。
+
+改快捷键：编辑 `~/.config/herdr-app/keys.json` 的 `global` 段，把键名换成你想要的，值 `mod.open:tailscale` 不动。Herdr 里没有改这个键的界面，`keys.json` 是唯一入口；保存后立即生效，不用重启。
 
 ## 许可证
 
