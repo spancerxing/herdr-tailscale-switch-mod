@@ -1,0 +1,3 @@
+mods/tailscale/gpui-kit.d.ts
+*.error
+.DS_Store
